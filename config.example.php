@@ -4,6 +4,8 @@ $config = [
     "startLat" => 0.0,         //Starting latitude
     "startLon" => 0.0,         //Starting longitude
     "startZoom" => 10,         //Starting zoom
+    "minZoom" => 10,           //Minimum zoom level
+    "maxZoom" => 18,           //Maximum zoom level
     "mapStyle" => "streets",   //Basic/Streets/Bright/Light/Dark/Satellite
     "areas" => [               //Array of coverage areas
         [
