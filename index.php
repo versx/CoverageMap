@@ -7,7 +7,6 @@
     <title><?=$config['title']?></title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
-    <script src="http://leaflet.github.io/Leaflet.draw/src/ext/GeometryUtil.js"></script>
   </head>
   <body><div id="mapid" style="top: 0; left: 0; position: absolute; height: 100%; width: 100%;"></div></body>
 </html>
@@ -28,11 +27,10 @@ info.onAdd = function (map) {
   return this._div;
 };
 info.update = function (props) {
-  this._div.innerHTML = '<h4>Area Selected:</h4>' + (props ?
-    '<b>' + props.name + '</b> ' + props.density + ' m<sup>2</sup>'
-    : 'Hover over a city');
+  this._div.innerHTML = '<h4>Area Selected:</h4>' + (props ? 
+    '<b>' + props.name + '</b> (' + props.size + ' km<sup>2</sup>)' :
+    'Hover over a city');
 };
-
 info.addTo(map);
 
 // Legend
@@ -42,24 +40,27 @@ var legend = L.control({position: 'topright'});
 legend.onAdd = function (map) {
   var div = L.DomUtil.create('div', 'info legend');
   var html = '';
-  html += '<span style="bold"><b>' + areas.length + ' total cities</b></span><hr>';
+  html += '<span><b>' + areas.length + ' total cities</b></span><hr>';
   for (var i = 0; i < areas.length; i++) {
     var area = areas[i];
     var color = area.color || getRandomColor();
     var polygon = L.polygon(area.polygons, {
-        fillColor: color,
-        weight: 0.5,
-        color: 'black'
+      fillColor: color,
+      weight: 0.5,
+      color: 'black'
     });
+    var size = 0;
+    var latLngs = polygon.getLatLngs();
+    if (latLngs.length > 0) {
+      var areaSize = geodesicArea(latLngs[0]);
+      size = convertAreaToSqkm(areaSize);
+    }
     var properties = {
       name: area.city,
-      color: color
+      color: color,
+      size: size.toFixed(2)
     };
 
-/*
-    var areaSize = L.GeometryUtil.geodesicArea(polygon.getLatLngs());
-    console.log("Area:", areaSize);
-*/
     var polygonGeoJson = polygon.toGeoJSON(properties);
     geojson = L.geoJson(polygonGeoJson, {
 		  style: style,
@@ -120,6 +121,28 @@ function resetHighlight(e) {
 
 function zoomToFeature(e) {
   map.fitBounds(e.target.getBounds());
+}
+
+function geodesicArea(latLngs) {
+  var pointsCount = latLngs.length,
+    area = 0.0,
+    d2r = Math.PI / 180,
+    p1, p2;
+  if (pointsCount > 2) {
+    for (var i = 0; i < pointsCount; i++) {
+      p1 = latLngs[i];
+      p2 = latLngs[(i + 1) % pointsCount];
+      area += ((p2.lng - p1.lng) * d2r) *
+          (2 + Math.sin(p1.lat * d2r) + Math.sin(p2.lat * d2r));
+    }
+    area = area * 6378137.0 * 6378137.0 / 2.0;
+  }
+
+  return Math.abs(area);
+}
+
+function convertAreaToSqkm(value) {
+  return value * 1.0E-6;
 }
 
 function getRandomColor() {
