@@ -9,19 +9,18 @@
     <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
     <script src="http://leaflet.github.io/Leaflet.draw/src/ext/GeometryUtil.js"></script>
   </head>
-  <body>
-    <div id="mapid" style="top: 0; left: 0; position: absolute; height: 100%; width: 100%;"></div>
-  </body>
+  <body><div id="mapid" style="top: 0; left: 0; position: absolute; height: 100%; width: 100%;"></div></body>
 </html>
 <script>
+// Map
 var map = L.map('mapid').setView([<?=$config['startLat']?>, <?=$config['startLon']?>], <?=$config['startZoom']?>);
-
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
   minZoom: <?=$config['minZoom']?> || 10,
   maxZoom: <?=$config['maxZoom']?> || 18,
   id: 'mapbox.<?=$config['mapStyle']?>'
 }).addTo(map);
 
+// Information
 var info = L.control();
 info.onAdd = function (map) {
   this._div = L.DomUtil.create('div', 'info');
@@ -36,33 +35,36 @@ info.update = function (props) {
 
 info.addTo(map);
 
+// Legend
 var geojson;
-
 var areas = <?=json_encode($config['areas'])?>;
 var legend = L.control({position: 'topright'});
 legend.onAdd = function (map) {
   var div = L.DomUtil.create('div', 'info legend');
+  var html = '';
+  html += '<span style="bold"><b>' + areas.length + ' total cities</b></span><hr>';
   for (var i = 0; i < areas.length; i++) {
     var area = areas[i];
-    var color = getRandomColor();
+    var color = area.color || getRandomColor();
     var polygon = L.polygon(area.polygons, {
         fillColor: color,
         weight: 0.5,
         color: 'black'
     });
+    var properties = {
+      name: area.city,
+      color: color
+    };
 
 /*
     var areaSize = L.GeometryUtil.geodesicArea(polygon.getLatLngs());
     console.log("Area:", areaSize);
 */
-
-    geojson = L.geoJson(polygon.toGeoJSON(), {
+    var polygonGeoJson = polygon.toGeoJSON(properties);
+    geojson = L.geoJson(polygonGeoJson, {
 		  style: style,
 		  onEachFeature: function (feature, layer) {
-        feature.properties = {
-          name: area.city,
-          color: color
-        };
+        feature.properties = properties;
         layer.on({
           mouseover: highlightFeature,
           mouseout: resetHighlight,
@@ -70,9 +72,18 @@ legend.onAdd = function (map) {
         });
       }
 	  }).addTo(map);
+    geojson.setStyle({
+      weight: 2,
+      opacity: 1,
+      color: 'white',
+      dashArray: '3',
+      fillOpacity: 0.7,
+      fillColor: properties.color
+    });
+    html += '<span>&ndash; ' + area.city + '</span><br>';
 
-    div.innerHTML += '<span>&ndash; ' + area.city + '</span><br>';
   }
+  div.innerHTML += html;
   return div;
 };
 legend.addTo(map);
@@ -84,45 +95,32 @@ function style(feature) {
     color: 'white',
     dashArray: '3',
     fillOpacity: 0.7,
-    fillColor: getRandomColor()
+    fillColor: feature.properties.color
 	};
 }
 
 function highlightFeature(e) {
   var layer = e.target;
   layer.setStyle({
-    weight: 5,
+    weight: 4,
     color: '#666',
     dashArray: '',
     fillOpacity: 0.7
   });
-
   if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
     layer.bringToFront();
   }
-
-  //console.log(geojson);
   info.update(layer.feature.properties);
 }
 
 function resetHighlight(e) {
-  geojson.resetStyle(e.target);//.feature.properties.color);
+  geojson.resetStyle(e.target);
   info.update();
 }
 
 function zoomToFeature(e) {
   map.fitBounds(e.target.getBounds());
 }
-
-/*
-function onEachFeature(feature, layer) {
-  layer.on({
-    mouseover: highlightFeature,
-    mouseout: resetHighlight,
-    click: zoomToFeature
-  });
-}
-*/
 
 function getRandomColor() {
   var letters = '0123456789ABCDEF';

@@ -10,6 +10,7 @@ $config = [
     "areas" => [               //Array of coverage areas
         [
             "city" => "City1", //Area name
+            "color" => "black", //Custom color or leave blank for random color
             "polygons" => [    //Area geofence
                 [0.0,0.0]      //Coordinates pair
             ]
