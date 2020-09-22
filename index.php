@@ -38,7 +38,7 @@ info.onAdd = function (map) {
 };
 info.update = function (props) {
     this._div.innerHTML = '<h4>Area Selected:</h4>' + (props ? 
-        '<b>' + props.name + '</b> (' + props.size + ' km<sup>2</sup>)' :
+        `<b>${props.name}</b> (${props.size} km<sup>2</sup>)` :
         'Hover over a city');
 };
 info.addTo(map);
@@ -92,11 +92,9 @@ legend.onAdd = function (map) {
             fillColor: properties.color
         });
         html += `
-        <span>
-            <a href="#" onclick="centerMap(${properties.center.lat},${properties.center.lng})">&ndash; ${area.city}</a>
-        </span><br>`;
+        <a href="#" onclick="centerMap(${properties.center.lat},${properties.center.lng})">&ndash; ${area.city}</a>
+        <br>`;
     }
-    html += '</div>';
     div.innerHTML += html;
     return div;
 };
@@ -178,12 +176,17 @@ function getRandomColor() {
     background: gray;
     color: darkgray;
 }
-.legend span {
+.legend a {
     color: black;
     width: 18px;
     height: 18px;
     margin-right: 8px;
     opacity: 0.7;
+    text-decoration: none;
+}
+.legend a:hover {
+    color: white;
+    background-color: dodgerblue;
 }
 .info { 
     padding: 6px 8px; 
