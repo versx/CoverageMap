@@ -170,11 +170,26 @@ function getRandomColor() {
 </script>
 
 <style>
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    width: 150px;
+    height: 55px;
+    border: 1px solid black;
+}
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
 .legend {
     text-align: left;
     line-height: 18px;
-    background: gray;
-    color: darkgray;
+    height: 480px;
+    overflow-y: auto;
 }
 .legend a {
     color: black;
@@ -188,16 +203,13 @@ function getRandomColor() {
     color: white;
     background-color: dodgerblue;
 }
-.info { 
-    padding: 6px 8px; 
-    font: 14px/16px Arial, Helvetica, sans-serif; 
-    background: white; 
-    background: rgba(255,255,255,0.8); 
-    box-shadow: 0 0 15px rgba(0,0,0,0.2); 
-    border-radius: 5px;
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
 }
-.info h4 {
-    margin: 0 0 5px;
-    color: #777;
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, .5);
+    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 </style>
