@@ -24,8 +24,7 @@ const tileserver = "<?=$config['tileserver']?>";
 
 // Map
 const map = L.map('mapid').setView([startLat, startLon], startZoom);
-//L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+L.tileLayer(tileserver, {
     minZoom: minZoom,
     maxZoom: maxZoom,
 }).addTo(map);
