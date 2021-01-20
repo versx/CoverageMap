@@ -6,7 +6,7 @@ $config = [
     "startZoom" => 10,         //Starting zoom
     "minZoom" => 10,           //Minimum zoom level
     "maxZoom" => 18,           //Maximum zoom level
-    "mapStyle" => "streets",   //Basic/Streets/Bright/Light/Dark/Satellite
+    "tileserver" => "https://tile.openstreetmap.org/{z}/{x}/{y}.png", //Custom tileserver url to use for the map
     "areas" => [               //Array of coverage areas
         [
             "city" => "City1", //Area name
