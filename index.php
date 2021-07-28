@@ -39,6 +39,8 @@ const startZoom = <?=$config['startZoom']?> || 10;
 const minZoom = <?=$config['minZoom']?> || 10;
 const maxZoom = <?=$config['maxZoom']?> || 18;
 const areas = <?=json_encode($config['areas'])?>;
+const areasText = "<?=$config['areasText']['singular']?>";
+const areasTextPlural = "<?=$config['areasText']['plural']?>";
 const tileserver = "<?=$config['tileserver']?>";
 
 let longestName = 0;
@@ -58,9 +60,9 @@ info.onAdd = function (map) {
     return this._div;
 };
 info.update = function (props) {
-    this._div.innerHTML = '<b>Area Selected:</b><br>' + (props ? 
+    this._div.innerHTML = `<b>${capitalize(areasText)} Selected:</b><br>` + (props ? 
         `<b>${props.name}</b> (${props.size} km<sup>2</sup>)` :
-        'Hover over a city');
+        `Hover over a ${areasText}`);
 };
 info.addTo(map);
 
@@ -70,7 +72,7 @@ let legend = L.control({position: 'topright'});
 legend.onAdd = function (map) {
     let div = L.DomUtil.create('div', 'info legend');
     let html = '';
-    html += '<span><b>' + areas.length + ' total cities</b></span><hr>';
+    html += `<span><b>${areas.length} total ${areasTextPlural}</b></span><hr>`;
     for (let i = 0; i < areas.length; i++) {
         let area = areas[i];
         if (area.city.length > longestName) {
@@ -191,6 +193,12 @@ function getRandomColor() {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+}
+
+function capitalize(text) {
+    const firstChar = text[0].toUpperCase();
+    const rest = text.substring(1);
+    return firstChar + rest;
 }
 </script>
 
