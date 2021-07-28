@@ -72,28 +72,20 @@ info.update = function (props) {
 };
 info.addTo(map);
 
-loadScanAreaPolygons();
-
 // Legend
 let geojson;
-let legend = L.control({position: 'topright'});
+const legend = L.control({position: 'topright'});
 legend.onAdd = function (map) {
-    let div = L.DomUtil.create('div', 'info legend');
-    let html = '';
-    html += `<span><b>${areas.length} total ${areasTextPlural}</b></span><hr>`;
-    for (let i = 0; i < areas.length; i++) {
-        let area = areas[i];
-        if (area.city.length > longestName) {
-            longestName = area.city.length;
+    const areas = loadScanAreaPolygons();
+    const div = L.DomUtil.create('div', 'info legend');
+    let html = `<span><b>${areas.length} total ${areasTextPlural}</b></span><hr>`;
+    const areaValues = Object.values(areas);
+    for (const area of areaValues) {
+        if (area.name.length > longestName) {
+            longestName = area.name.length;
         }
-        const area = areas[i];
-        /*
         html += `
-        <a href="#" onclick="centerMap(${properties.center.lat},${properties.center.lng},${properties.zoom})">&ndash; ${area.city}</a>
-        <br>`;
-        */
-        html += `
-        <a href="#">&ndash; ${area.city}</a>
+        <a href="#" onclick="centerMap(${area.center.lat},${area.center.lng},${area.zoom})">&ndash; ${area.name}</a>
         <br>`;
     }
     div.innerHTML += html;
@@ -103,7 +95,7 @@ legend.addTo(map);
 // TODO: Set legend width to longest name length
 
 function centerMap(lat, lng, zoom = 13) {
-    map.setView([lat, lng], zoom)
+    map.setView([lat, lng], zoom || 13)
 }
 
 function style(feature) {
@@ -176,13 +168,19 @@ function capitalize(text) {
     return firstChar + rest;
 }
 
-function loadScanAreaPolygons () {
-    $.getJSON('./areas.json', function (data) {
+function loadScanAreaPolygons() {
+    let areas = {};
+    $.ajaxSetup({
+        async: false,
+    });
+    $.getJSON('./areas.json', function(data) {
         try {
             geojson = L.geoJson(data, {
                 style: style,
                 onEachFeature: function(features, featureLayer) {
                     if (!features.properties.hidden) {
+                        areas[features.properties.name] = features.properties;
+                        //areas.push(features.properties.name);
                         const coords = features.geometry.coordinates[0];
                         const areaSize = geodesicArea(coords);
                         const size = convertAreaToSqkm(areaSize).toFixed(2);
@@ -193,12 +191,12 @@ function loadScanAreaPolygons () {
                         });
                         features.properties.size = size;
                         features.properties.color = features.properties.color || getRandomColor();
+                        features.properties.center = featureLayer.getBounds().getCenter();
                         featureLayer.setStyle({
-                            weight: 2,
-                            opacity: 1,
-                            color: 'white',
-                            dashArray: '3',
-                            fillOpacity: 0.7,
+                            weight: features.properties.weight || 2,
+                            opacity: features.properties.opacity || 1,
+                            dashArray: features.properties.dashArray || '3',
+                            fillOpacity: features.properties.fillOpacity || 0.7,
                             fillColor: features.properties.color,
                         });
                         featureLayer.bindPopup(getScanAreaPopupContent(features.properties, size));
@@ -210,6 +208,7 @@ function loadScanAreaPolygons () {
             console.error('Failed to load areas.json file\nError:', err);
         }
     });
+    return areas;
 }
 
 function getScanAreaPopupContent(properties, size) {
