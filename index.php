@@ -131,7 +131,11 @@ function resetHighlight(e) {
 }
 
 function zoomToFeature(e) {
-    map.fitBounds(e.target.getBounds());
+    const properties = e.target.feature.properties;
+    const zoom = properties.zoom || 13;
+    map.fitBounds(e.target.getBounds(), {
+        maxZoom: zoom,
+    });
 }
 
 function geodesicArea(latLngs) {
@@ -181,8 +185,9 @@ function loadScanAreaPolygons() {
                 style: style,
                 onEachFeature: function(features, featureLayer) {
                     if (!features.properties.hidden) {
+                        // Add area to cached area list
                         areas[features.properties.name] = features.properties;
-                        //areas.push(features.properties.name);
+
                         const coords = features.geometry.coordinates[0];
                         const areaSize = geodesicArea(coords);
                         const size = convertAreaToSqkm(areaSize).toFixed(2);
