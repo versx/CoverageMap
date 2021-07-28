@@ -18,26 +18,6 @@ $config = [
     "areasText" => [
         "singular" => "city",
         "plural" => "cities"
-    ],
-    // Array of coverage areas
-    "areas" => [
-        [
-            // Area name
-            "city" => "City1",
-            // Custom color or leave blank for random color
-            "color" => "black",
-            // Area geofence
-            "polygons" => [
-                // Coordinates pair
-                [0.0,0.0]
-            ]
-        ],
-        [
-            "city" => "City2",
-            "polygons" => [
-                [0.1,0.1]
-            ]
-        ]
     ]
 ];
 ?>

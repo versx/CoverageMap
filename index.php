@@ -44,9 +44,15 @@ const areasTextPlural = "<?=$config['areasText']['plural']?>";
 const tileserver = "<?=$config['tileserver']?>";
 
 let longestName = 0;
+  
+// Layers
+const polygonLayer = new L.LayerGroup();
 
 // Map
-const map = L.map('mapid').setView([startLat, startLon], startZoom);
+const map = L.map('mapid', {
+    preferCanvas: true,
+    layers: [polygonLayer],
+}).setView([startLat, startLon], startZoom);
 L.tileLayer(tileserver, {
     minZoom: minZoom,
     maxZoom: maxZoom,
@@ -66,6 +72,8 @@ info.update = function (props) {
 };
 info.addTo(map);
 
+loadScanAreaPolygons();
+
 // Legend
 let geojson;
 let legend = L.control({position: 'topright'});
@@ -78,47 +86,14 @@ legend.onAdd = function (map) {
         if (area.city.length > longestName) {
             longestName = area.city.length;
         }
-        let color = area.color || getRandomColor();
-        let polygon = L.polygon(area.polygons, {
-            fillColor: color,
-            weight: 0.5,
-            color: 'black'
-        }); 
-        let size = 0;
-        let latLngs = polygon.getLatLngs();
-        if (latLngs.length > 0) {
-            let areaSize = geodesicArea(latLngs[0]);
-            size = convertAreaToSqkm(areaSize);
-        }
-        let properties = {
-            name: area.city,
-            color: color,
-            size: size.toFixed(2),
-            center: polygon.getBounds().getCenter()
-        };
-
-        let polygonGeoJson = polygon.toGeoJSON(properties);
-        geojson = L.geoJson(polygonGeoJson, {
-		    style: style,
-		    onEachFeature: function (feature, layer) {
-                feature.properties = properties;
-                layer.on({
-                    mouseover: highlightFeature,
-                    mouseout: resetHighlight,
-                    click: zoomToFeature
-                });
-            }
-	    }).addTo(map);
-        geojson.setStyle({
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.7,
-            fillColor: properties.color
-        });
+        const area = areas[i];
+        /*
         html += `
-        <a href="#" onclick="centerMap(${properties.center.lat},${properties.center.lng})">&ndash; ${area.city}</a>
+        <a href="#" onclick="centerMap(${properties.center.lat},${properties.center.lng},${properties.zoom})">&ndash; ${area.city}</a>
+        <br>`;
+        */
+        html += `
+        <a href="#">&ndash; ${area.city}</a>
         <br>`;
     }
     div.innerHTML += html;
@@ -127,8 +102,8 @@ legend.onAdd = function (map) {
 legend.addTo(map);
 // TODO: Set legend width to longest name length
 
-function centerMap(lat, lng) {
-    map.setView([lat, lng], 13)
+function centerMap(lat, lng, zoom = 13) {
+    map.setView([lat, lng], zoom)
 }
 
 function style(feature) {
@@ -139,7 +114,7 @@ function style(feature) {
         dashArray: '3',
         fillOpacity: 0.7,
         fillColor: feature.properties.color
-	  };
+	};
 }
 
 function highlightFeature(e) {
@@ -174,8 +149,8 @@ function geodesicArea(latLngs) {
         for (let i = 0; i < pointsCount; i++) {
             p1 = latLngs[i];
             p2 = latLngs[(i + 1) % pointsCount];
-            area += ((p2.lng - p1.lng) * d2r) *
-                (2 + Math.sin(p1.lat * d2r) + Math.sin(p2.lat * d2r));
+            area += ((p2[0] - p1[0]) * d2r) * // lng
+                (2 + Math.sin(p1[1] * d2r) + Math.sin(p2[1] * d2r)); // lat
         }
         area = area * 6378137.0 * 6378137.0 / 2.0;
     }
@@ -199,6 +174,51 @@ function capitalize(text) {
     const firstChar = text[0].toUpperCase();
     const rest = text.substring(1);
     return firstChar + rest;
+}
+
+function loadScanAreaPolygons () {
+    $.getJSON('./areas.json', function (data) {
+        try {
+            geojson = L.geoJson(data, {
+                style: style,
+                onEachFeature: function(features, featureLayer) {
+                    if (!features.properties.hidden) {
+                        const coords = features.geometry.coordinates[0];
+                        const areaSize = geodesicArea(coords);
+                        const size = convertAreaToSqkm(areaSize).toFixed(2);
+                        featureLayer.on({
+                            mouseover: highlightFeature,
+                            mouseout: resetHighlight,
+                            click: zoomToFeature
+                        });
+                        features.properties.size = size;
+                        features.properties.color = features.properties.color || getRandomColor();
+                        featureLayer.setStyle({
+                            weight: 2,
+                            opacity: 1,
+                            color: 'white',
+                            dashArray: '3',
+                            fillOpacity: 0.7,
+                            fillColor: features.properties.color,
+                        });
+                        featureLayer.bindPopup(getScanAreaPopupContent(features.properties, size));
+                    }
+                }
+            });
+            polygonLayer.addLayer(geojson);
+        } catch (err) {
+            console.error('Failed to load areas.json file\nError:', err);
+        }
+    });
+}
+
+function getScanAreaPopupContent(properties, size) {
+    const content = `
+      <center>
+        <h6>Area: <b>${properties.name}</b></h6>
+        Size: ${size} km<sup>2</sup>
+      </center>`;
+    return content;
 }
 </script>
 
