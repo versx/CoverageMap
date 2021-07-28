@@ -11,12 +11,15 @@ $config = [
         [
             "city" => "City1", //Area name
             "color" => "black", //Custom color or leave blank for random color
+            "zoom" => 13,
             "polygons" => [    //Area geofence
                 [0.0,0.0]      //Coordinates pair
             ]
         ],
         [
             "city" => "City2",
+            "color" => "red",
+            "zoom" => 13,
             "polygons" => [
                 [0.1,0.1]
             ]

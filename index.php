@@ -63,7 +63,7 @@ legend.onAdd = function (map) {
         const area = areas[i];
         /*
         html += `
-        <a href="#" onclick="centerMap(${properties.center.lat},${properties.center.lng})">&ndash; ${area.city}</a>
+        <a href="#" onclick="centerMap(${properties.center.lat},${properties.center.lng},${properties.zoom})">&ndash; ${area.city}</a>
         <br>`;
         */
         html += `
@@ -75,8 +75,8 @@ legend.onAdd = function (map) {
 };
 legend.addTo(map);
 
-function centerMap(lat, lng) {
-    map.setView([lat, lng], 13)
+function centerMap(lat, lng, zoom = 13) {
+    map.setView([lat, lng], zoom)
 }
 
 function style(feature) {
