@@ -68,7 +68,8 @@ legend.onAdd = function (map) {
             name: area.city,
             color: color,
             size: size.toFixed(2),
-            center: polygon.getBounds().getCenter()
+            center: polygon.getBounds().getCenter(),
+            zoom: area.zoom || 13,
         };
 
         let polygonGeoJson = polygon.toGeoJSON(properties);
@@ -92,7 +93,7 @@ legend.onAdd = function (map) {
             fillColor: properties.color
         });
         html += `
-        <a href="#" onclick="centerMap(${properties.center.lat},${properties.center.lng})">&ndash; ${area.city}</a>
+        <a href="#" onclick="centerMap(${properties.center.lat},${properties.center.lng},${properties.zoom})">&ndash; ${area.city}</a>
         <br>`;
     }
     div.innerHTML += html;
@@ -100,8 +101,8 @@ legend.onAdd = function (map) {
 };
 legend.addTo(map);
 
-function centerMap(lat, lng) {
-    map.setView([lat, lng], 13)
+function centerMap(lat, lng, zoom = 13) {
+    map.setView([lat, lng], zoom)
 }
 
 function style(feature) {
