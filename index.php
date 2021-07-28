@@ -41,6 +41,8 @@ const maxZoom = <?=$config['maxZoom']?> || 18;
 const areas = <?=json_encode($config['areas'])?>;
 const tileserver = "<?=$config['tileserver']?>";
 
+let longestName = 0;
+
 // Map
 const map = L.map('mapid').setView([startLat, startLon], startZoom);
 L.tileLayer(tileserver, {
@@ -56,7 +58,7 @@ info.onAdd = function (map) {
     return this._div;
 };
 info.update = function (props) {
-    this._div.innerHTML = '<h4>Area Selected:</h4>' + (props ? 
+    this._div.innerHTML = '<b>Area Selected:</b><br>' + (props ? 
         `<b>${props.name}</b> (${props.size} km<sup>2</sup>)` :
         'Hover over a city');
 };
@@ -71,6 +73,9 @@ legend.onAdd = function (map) {
     html += '<span><b>' + areas.length + ' total cities</b></span><hr>';
     for (let i = 0; i < areas.length; i++) {
         let area = areas[i];
+        if (area.city.length > longestName) {
+            longestName = area.city.length;
+        }
         let color = area.color || getRandomColor();
         let polygon = L.polygon(area.polygons, {
             fillColor: color,
@@ -118,6 +123,7 @@ legend.onAdd = function (map) {
     return div;
 };
 legend.addTo(map);
+// TODO: Set legend width to longest name length
 
 function centerMap(lat, lng) {
     map.setView([lat, lng], 13)
@@ -206,7 +212,7 @@ function getRandomColor() {
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     border-radius: 5px;
     width: 150px;
-    height: 55px;
+    height: 65px;
     border: 1px solid black;
 }
 .info h4 {
