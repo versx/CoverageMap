@@ -78,14 +78,16 @@ const legend = L.control({position: 'topright'});
 legend.onAdd = function (map) {
     const areas = loadScanAreaPolygons();
     const div = L.DomUtil.create('div', 'info legend');
-    let html = `<span><b>${areas.length} total ${areasTextPlural}</b></span><hr>`;
-    const areaValues = Object.values(areas);
-    for (const area of areaValues) {
-        if (area.name.length > longestName) {
-            longestName = area.name.length;
+    let areaNames = Object.keys(areas);
+    let html = `<span><b>${areaNames.length} total ${areasTextPlural}</b></span><hr>`;
+    areaNames.sort((x, y) => x - y);
+    for (const areaName of areaNames) {
+        const area = areas[areaName];
+        if (areaName.length > longestName) {
+            longestName = areaName.length;
         }
         html += `
-        <a href="#" onclick="centerMap(${area.center.lat},${area.center.lng},${area.zoom})">&ndash; ${area.name}</a>
+        <a href="#" onclick="centerMap(${area.center.lat},${area.center.lng},${area.zoom})">&ndash; ${areaName}</a>
         <br>`;
     }
     div.innerHTML += html;
