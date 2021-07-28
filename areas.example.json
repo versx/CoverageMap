@@ -22,6 +22,7 @@
                 "opacity": 1,
                 "dashArray": "3",
                 "fillOpacity": 0.7,
+                "zoom": 13,
                 "hidden": false
             }
         }
