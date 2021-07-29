@@ -2,6 +2,15 @@
 $config = [
     // Title of the coverage map page
     "title" => "Map Coverage",
+    // Custom navbar header links on the left and right sides of the page
+    "header" => [
+        "left" => [
+            [ "name" => "Stats", "url" => "https://stats.example.com", "icon" => "fas fa-chart-bar" ]
+        ],
+        "right" => [
+            [ "name" => "Discord", "url" => "https://discord.com", "icon" => "fab fa-discord" ]
+        ]
+    ],
     // Map latitude upon startup
     "startLat" => 0.0,
     // Map longitude upon startup
