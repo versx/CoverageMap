@@ -11,6 +11,8 @@ $config = [
             [ "name" => "Discord", "url" => "https://discord.com", "icon" => "fab fa-discord" ]
         ]
     ],
+    // Sort legend by names alphabetically
+    "legendSort" => true,
     // Width in pixels of the legend and selected city control
     "legendWidth" => 160,
     // Map latitude upon startup
