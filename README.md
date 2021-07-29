@@ -1,5 +1,9 @@
 # CoverageMap  
 
+## Preview  
+![image](https://user-images.githubusercontent.com/1327440/127419381-dc8a7dcb-7190-469e-9766-f700e614aea2.png)
+
+
 ## Prerequisites  
 - PHP 5 or higher  
 
