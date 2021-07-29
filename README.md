@@ -14,3 +14,7 @@
 1. Copy areas file `cp areas.example.json areas.json`
 1. Fill out `areas.json` with available areas in geojson format  
 1. Copy favicon (or replace with own) `cp favicon.example.ico favicon.ico`  
+
+## Notes  
+- Omitting geojson properties will result in default values being used.  
+- Not specifying a color value in the geojson properties will default to a random color generated.  
