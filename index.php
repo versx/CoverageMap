@@ -80,7 +80,7 @@ legend.onAdd = function (map) {
     const div = L.DomUtil.create('div', 'info legend');
     let areaNames = Object.keys(areas);
     let html = `<span><b>${areaNames.length} total ${areasTextPlural}</b></span><hr>`;
-    areaNames.sort((x, y) => x - y);
+    areaNames.sort();
     for (const areaName of areaNames) {
         const area = areas[areaName];
         if (areaName.length > longestName) {
