@@ -2,6 +2,15 @@
 $config = [
     // Title of the coverage map page
     "title" => "Map Coverage",
+    // Custom navbar header links on the left and right sides of the page
+    "header" => [
+        "left" => [
+            [ "name" => "Stats", "url" => "https://stats.example.com", "icon" => "fas fa-chart-bar" ]
+        ],
+        "right" => [
+            [ "name" => "Discord", "url" => "https://discord.com", "icon" => "fab fa-discord" ]
+        ]
+    ],
     // Width in pixels of the legend and selected city control
     "legendWidth" => 160,
     // Map latitude upon startup
