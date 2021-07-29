@@ -76,7 +76,7 @@ const areasTextPlural = "<?=$config['areasText']['plural']?>";
 const tileserver = "<?=$config['tileserver']?>";
 
 let longestName = 0;
-  
+
 // Layers
 const polygonLayer = new L.LayerGroup();
 
@@ -112,7 +112,7 @@ legend.onAdd = function (map) {
     const div = L.DomUtil.create('div', 'info legend');
     let areaNames = Object.keys(areas);
     let html = `<span><b>${areaNames.length} total ${areasTextPlural}</b></span><hr>`;
-    areaNames.sort((x, y) => x - y);
+    areaNames.sort();
     for (const areaName of areaNames) {
         const area = areas[areaName];
         if (areaName.length > longestName) {
@@ -277,7 +277,7 @@ function getScanAreaPopupContent(properties, size) {
     background: rgba(255,255,255,0.8);
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     border-radius: 5px;
-    width: 150px;
+    width: <?= $config['legendWidth']?>px;
     height: 65px;
     border: 1px solid black;
 }
