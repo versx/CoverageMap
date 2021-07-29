@@ -2,6 +2,8 @@
 $config = [
     // Title of the coverage map page
     "title" => "Map Coverage",
+    // Width in pixels of the legend and selected city control
+    "legendWidth" => 160,
     // Map latitude upon startup
     "startLat" => 0.0,
     // Map longitude upon startup
