@@ -31,7 +31,6 @@
 </html>
 
 <script>
-// TODO: Scrollable legend
 
 const startLat = <?=$config['startLat']?>;
 const startLon = <?=$config['startLon']?>;
@@ -47,16 +46,19 @@ let longestName = 0;
 
 // Layers
 const polygonLayer = new L.LayerGroup();
+const borderLayer = new L.LayerGroup();
 
 // Map
 const map = L.map('mapid', {
     preferCanvas: true,
-    layers: [polygonLayer],
+    layers: [borderLayer, polygonLayer],
 }).setView([startLat, startLon], startZoom);
 L.tileLayer(tileserver, {
     minZoom: minZoom,
     maxZoom: maxZoom,
 }).addTo(map);
+
+loadBorderPolygons();
 
 // Information
 const info = L.control();
@@ -216,6 +218,28 @@ function loadScanAreaPolygons() {
         }
     });
     return areas;
+}
+
+function loadBorderPolygons() {
+    $.getJSON('./borders.json', function(data) {
+        try {
+            const geojson = L.geoJson(data, {
+                onEachFeature: function(features, featureLayer) {
+                    featureLayer.setStyle({
+                        fill: false,
+                        color: features.properties.color || 'red',
+                        weight: features.properties.weight || 3,
+                        interactive: false,
+                    });
+                    const polyline = L.polyline(features.geometry.coordinates[0])
+                    polyline.addTo(map);
+                }
+            });
+            borderLayer.addLayer(geojson);
+        } catch (err) {
+            console.error('Failed to load borders.json file\nError:', err);
+        }
+    });
 }
 
 function getScanAreaPopupContent(properties, size) {
