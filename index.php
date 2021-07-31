@@ -73,6 +73,7 @@ const areas = <?=json_encode($config['areas'])?>;
 const areasText = "<?=$config['areasText']['singular']?>";
 const areasTextPlural = "<?=$config['areasText']['plural']?>";
 const tileserver = "<?=$config['tileserver']?>";
+const legendSort = <?=$config['legendSort'] !== false ? '1' : '0'?>;
 
 let longestName = 0;
 
@@ -114,7 +115,9 @@ legend.onAdd = function (map) {
     const div = L.DomUtil.create('div', 'info legend');
     let areaNames = Object.keys(areas);
     let html = `<span><b>${areaNames.length} total ${areasTextPlural}</b></span><hr>`;
-    areaNames.sort();
+    if (legendSort) {
+        areaNames.sort();
+    }
     for (const areaName of areaNames) {
         const area = areas[areaName];
         if (areaName.length > longestName) {
