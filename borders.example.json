@@ -1,0 +1,25 @@
+{
+    "type": "FeatureCollection", 
+    "features": [
+        {
+            "geometry": {
+                "type": "Polygon", 
+                "coordinates": [
+                    [
+                        [
+                            -100, 
+                            4
+                        ]
+                    ]
+                ]
+            }, 
+            "type": "Feature", 
+            "id": 0, 
+            "properties": {
+                "name": "Unknown Areaname", 
+                "color": "red",
+                "weight": 3
+            }
+        }
+    ]
+}
